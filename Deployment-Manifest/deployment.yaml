@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: web
-  replicas: 1
+  replicas: 4
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name:  web
-        image:  denizturkmen/rollingupdatev1:latest
+        image:  denizturkmen/rollingupdatev2:latest
         resources:
           requests:
             cpu: 100m
