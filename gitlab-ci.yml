@@ -1,0 +1,44 @@
+stages:
+  - build
+  - push
+  - deployment
+
+docker-build:
+  stage: build
+  # tags:
+  #   - shell-runner
+  script:
+    - echo "Docker Build Basliyor...."
+    - docker build --tag denizturkmen/frontend-ci-cd:latest .
+    - docker build --tag denizturkmen/frontend-ci-cd:$CI_COMMIT_SHORT_SHA .
+  # when: manual
+  only:
+    - master
+  
+docker-push:
+  stage: push
+  # tags:
+  #   - shell-runner 
+  script:
+    - echo "Docker Hub Image Gonderme Basliyor..."
+    - docker login -u=$dhubusername -p=$dhubpassword
+    - docker push denizturkmen/frontend-ci-cd:latest
+    - docker push denizturkmen/frontend-ci-cd:$CI_COMMIT_SHORT_SHA
+  # when: manual
+  only:
+    - master
+
+deployment-docker:
+  stage: deployment
+  # tags:
+  # - shell-runner 
+  script:
+    - echo "Docker Deployment basliyor...."
+    - docker login -u=$dhubusername -p=$dhubpassword
+    - docker pull denizturkmen/frontend-ci-cd:$CI_COMMIT_SHORT_SHA
+    - docker container rm -f dockerdeployment 
+    - docker run --name dockerdeployment --detach --publish 8082:80 denizturkmen/frontend-ci-cd:$CI_COMMIT_SHORT_SHA    
+  # when: manual
+  only:
+    - master
+  
